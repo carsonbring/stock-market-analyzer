@@ -1,13 +1,14 @@
 import requests
 import pandas as pd
-import bs4 as bs
-import yfinance as yf
+import pickle
 import datetime 
 
 from sec_api import XbrlApi, QueryApi
 with open('edgar.config') as f:
     api_key = f.readline()
-
+with open('tickers.pkl', 'rb') as f:
+    tickers = pickle.load(f) 
+    f.close()
 #first getting the list of tickers 
 xbrlApi = XbrlApi(api_key)
 
@@ -34,16 +35,6 @@ def get_xbrl_url(ticker):
     link_to_html = most_recent_filing.get('linkToHtml')
     return link_to_html    
 
-def save_sp500_tickers():
-    resp = requests.get('http://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
-    soup = bs.BeautifulSoup(resp.text, 'lxml')
-    table = soup.find('table', {'class': 'wikitable sortable'})
-    tickers = []
-    for row in table.findAll('tr')[1:]:
-        ticker = row.findAll('td')[0].text
-        tickers.append(ticker[:-1])
-    return tickers
-
 def get_income_statement(xbrl_json):
     income_statement_store = {}
     for usGaapItem in xbrl_json['StatementsOfIncome']:
@@ -62,7 +53,6 @@ def get_income_statement(xbrl_json):
     #switching columns and rows so that US GAAP items are rows and each column header represents a date range
     return income_statement.T
 
-tickers = save_sp500_tickers()
 
 print(tickers)
 for ticker in tickers:
