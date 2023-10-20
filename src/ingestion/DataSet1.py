@@ -1,6 +1,9 @@
 import requests
 import pandas as pd
+
 import pickle
+
+
 import datetime 
 
 from sec_api import XbrlApi, QueryApi
@@ -9,6 +12,15 @@ with open('edgar.config') as f:
 with open('tickers.pkl', 'rb') as f:
     tickers = pickle.load(f) 
     f.close()
+
+spark.conf.set(
+    "fs.azure.account.key.storagesma.dfs.core.windows.net",
+    dbutils.secrets.get(scope="Databricks-scope", key="databricks-key"))
+
+uri = "abfss://financialreports@storagesma.dfs.core.windows.net/"
+
+
+
 #first getting the list of tickers 
 xbrlApi = XbrlApi(api_key)
 
@@ -64,4 +76,4 @@ for ticker in tickers:
 
     print(ticker)
     print('--------------')
-    print(income_statement)
+    display(income_statement)
