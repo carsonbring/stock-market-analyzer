@@ -8,6 +8,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import time
 import matplotlib.pyplot as plt
+
+
 #setting my config settings for spark
 spark.conf.set(
     "fs.azure.account.key.storagesma.dfs.core.windows.net",
@@ -18,7 +20,20 @@ uri = "abfss://quarterlyfinancialreports@storagesma.dfs.core.windows.net/"
 with open('tickers.pkl', 'rb') as f:
     tickers = pickle.load(f) 
     f.close()
+
+
 #EDA : Yahoo Finance - Financial Reports
+
+# Pandas Profiling
+# ------------------------------
+
+#grabbing an example of a financial report - AAPL
+df = spark.read.parquet(uri + f'AAPL/part*')
+print(df.describe())
+display(df)
+
+# Doing some operations on the data just for practice
+# ------------------------------------------
 max_gross_profit = 0
 max_gross_profit_ticker = ""
 max_net_income = 0
@@ -61,8 +76,19 @@ spark.conf.set(
     dbutils.secrets.get(scope="Databricks-scope", key="databricks-key"))
 uri = "abfss://newsandsentiments@storagesma.dfs.core.windows.net/"
 
+# Pandas Profiling
+# ------------------------------
 
 
+df = spark.read.parquet(uri + f'AAPL/part*')
+
+display(df)
+
+
+
+
+# Doing some operations on the data just for practice
+# ------------------------------------------
 highest_overall_sentiment_score = 0
 highest_overall_sentiment_score_ticker = ""
 top_sentiment_score_tickers = {}
