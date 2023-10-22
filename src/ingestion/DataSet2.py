@@ -13,8 +13,19 @@ spark.conf.set(
 uri = "abfss://newsandsentiments@storagesma.dfs.core.windows.net/"
 
 
-spark = SparkSession.builder.appName("JsonToCsv").getOrCreate()
-#open the config file where the api_key is for sec edgar api
+spark = SparkSession.builder.appName("NewsAndSentiments").getOrCreate()
+
+import pickle
+import datetime 
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+import time
+#setting my config settings for spark
+spark.conf.set(
+    "fs.azure.account.key.storagesma.dfs.core.windows.net",
+    dbutils.secrets.get(scope="Databricks-scope", key="databricks-key"))
+
+uri = "abfss://newsandsentiments@storagesma.dfs.core.windows.net/"
 with open('av.config') as f:
     api_key = f.readline()
     f.close()
