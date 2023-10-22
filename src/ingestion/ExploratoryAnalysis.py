@@ -7,6 +7,7 @@ import datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import time
+import matplotlib.pyplot as plt
 #setting my config settings for spark
 spark.conf.set(
     "fs.azure.account.key.storagesma.dfs.core.windows.net",
@@ -22,26 +23,36 @@ max_gross_profit = 0
 max_gross_profit_ticker = ""
 max_net_income = 0
 max_net_income_ticker = ""
-
+top_gross_profit_tickers = {}
+top_net_income_tickers = {}
 for ticker in tickers:
     try:
         df = spark.read.parquet(uri + f'{ticker}/part*')
         #for analysis, I will be using the most recent quarterly report (row 1)
         gross_profit = df.select("Total Revenue").first()["Total Revenue"]
         net_income = df.select("Net Income").first()["Net Income"]
-        if int(gross_profit) > max_gross_profit:
-            max_gross_profit = gross_profit
-            max_gross_profit_ticker = ticker
-        if int(net_income) > max_net_income:
-            max_net_income = gross_profit
-            max_net_income_ticker = ticker
-    except:
+        #putting ticker and values inside of dictionaries to sort for results
+        top_gross_profit_tickers[ticker] = int(gross_profit)
+        top_net_income_tickers[ticker] = int(net_income)
+    except Exception as e:
         print(f"skipping report for {ticker}")
+        print(e)
 
-#WMT (Walmart)
-print(f'Company with the highest revenue last quarterly report is {max_gross_profit_ticker} with {max_gross_profit} ')
+#creating bar chart for top 5 gross profit companies
+sorted_gross_profit = sorted(top_gross_profit_tickers.items(), key=lambda x: x[1], reverse=True)[:5]
+plt.bar([item[0] for item in sorted_gross_profit], [item[1] for item in sorted_gross_profit])
+plt.title('Top 5 Companies with the highest revenue')
+plt.xlabel('Company Ticker')
+plt.ylabel('Total Revenue')
+plt.show()
 
-print(f'Company with the highest net income in the last quarterly report is {max_net_income} with {max_net_income_ticker}')
+#creating bar chart for top 5 net income companies
+sorted_net_income = sorted(top_net_income_tickers.items(), key=lambda x: x[1], reverse=True)[:5]
+plt.bar([item[0] for item in sorted_net_income], [item[1] for item in sorted_net_income])
+plt.title('Top 5 Companies with the highest net income')
+plt.xlabel('Company Ticker')
+plt.ylabel('Net Income')
+plt.show()
 
 #EDA : Alpha Vantage - News and Sentiment
 
@@ -54,7 +65,7 @@ uri = "abfss://newsandsentiments@storagesma.dfs.core.windows.net/"
 
 highest_overall_sentiment_score = 0
 highest_overall_sentiment_score_ticker = ""
-
+top_sentiment_score_tickers = {}
 for ticker in tickers:
     try:
         df = spark.read.parquet(uri + f'{ticker}/part*')
@@ -64,13 +75,21 @@ for ticker in tickers:
         df = df.filter(col('overall_sentiment_score_float').isNotNull())
         #summing the column and storing the result
         sum_result = df.agg({'overall_sentiment_score_float': 'sum'}).collect()[0]["sum(overall_sentiment_score_float)"]
-        #setting the max if the sum_result is higher than the highest_overall_sentiment_score
-        if sum_result > highest_overall_sentiment_score:
-            highest_overall_sentiment_score = sum_result
-            highest_overall_sentiment_score_ticker = ticker
-    except:
-        print(f'Skipping news analysis for {ticker}')
-#HAS
-print(f'The company with the highest overall sentiment score is {highest_overall_sentiment_score_ticker} with an average score across 10 articles being {highest_overall_sentiment_score/10}')
+        #storing in dictionary to sort later
+        top_sentiment_score_tickers[ticker] = sum_result
 
+    except Exception as e:
+        print(f'Skipping news analysis for {ticker}')
+        print(e)
+
+#printing top 5 sentiment score tickers
+print("\nTop 5 Companies with the highest overall sentiment score:")
+for ticker, value in sorted(top_sentiment_score_tickers.items(), key=lambda x: x[1], reverse=True)[:5]:
+    print(f"{ticker}: {value/10}")
+sorted_sentiment_scores = sorted(top_sentiment_score_tickers.items(), key=lambda x: x[1], reverse=True)[:5]
+plt.bar([item[0] for item in sorted_sentiment_scores], [item[1] for item in sorted_sentiment_scores])
+plt.title('Top 5 Companies with the sentiment scores')
+plt.xlabel('Company Ticker')
+plt.ylabel('Sentiment Score')
+plt.show()
 
