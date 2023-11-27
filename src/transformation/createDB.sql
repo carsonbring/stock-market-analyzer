@@ -1,7 +1,6 @@
 CREATE TABLE DIM_Ticker (
     Ticker STRING PRIMARY KEY,
-    CompanyName STRING,
-    Price DOUBLE
+    CompanyName STRING
 );
 CREATE TABLE DIM_Report (
     Ticker STRING,
