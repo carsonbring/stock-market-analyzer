@@ -7,16 +7,20 @@ CREATE TABLE DIM_Report (
     Ticker STRING,
     ReportDate DATE,
     TotalRevenue DOUBLE,
-    TotalProfit DOUBLE,
+    NetIncome DOUBLE,
+    GrossProfit DOUBLE,
     EPS DOUBLE,
+    NormalizedEBITDA DOUBLE,
+
     PRIMARY KEY (Ticker, ReportDate),
     FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker)
     
 );
 CREATE TABLE DIM_Article (
-    Article_ID INT PRIMARY KEY,
+    Article_ID INT PRIMARY KEY identity(1,1),
     Ticker STRING,
-    Article_Info STRING,
+    Article_Title STRING,
+    Article_Source STRING,
     Article_Sentiment DOUBLE,
     Article_Date DATE,
     FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker)
