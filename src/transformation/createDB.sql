@@ -1,6 +1,7 @@
 CREATE TABLE DIM_Ticker (
     Ticker STRING PRIMARY KEY,
-    CompanyName STRING
+    CompanyName STRING,
+    Average_Sentiment DOUBLE
 );
 CREATE TABLE DIM_Report (
     Ticker STRING,
@@ -15,26 +16,11 @@ CREATE TABLE DIM_Report (
     FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker)
     
 );
-CREATE TABLE DIM_Article (
-    Article_ID INT PRIMARY KEY identity(1,1),
-    Ticker STRING,
-    Article_Title STRING,
-    Article_Source STRING,
-    Article_Sentiment DOUBLE,
-    Article_Date DATE,
-    FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker)
-    
-);
 CREATE TABLE FACT_Analysis (
-    Article_ID INT,
+    FACT_ID INT PRIMARY KEY identity(1,1),
     Ticker STRING,
     ReportDate DATE,
-    SentimentScore DOUBLE,
-    TotalRevenue DOUBLE,
-    TotalProfit DOUBLE,
-    EPS DOUBLE,
-    PRIMARY KEY (Article_ID, ReportDate),
-    FOREIGN KEY (Article_ID) REFERENCES DIM_Article (Article_ID),
+    FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker),
     FOREIGN KEY (Ticker, ReportDate) REFERENCES DIM_Report (Ticker, ReportDate)
     
 );
