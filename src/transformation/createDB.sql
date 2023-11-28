@@ -1,26 +1,25 @@
 CREATE TABLE DIM_Ticker (
-    Ticker STRING PRIMARY KEY,
-    CompanyName STRING,
-    Average_Sentiment DOUBLE
+    Ticker VARCHAR(255) PRIMARY KEY,
+    CompanyName VARCHAR(255),
+    Average_Sentiment FLOAT
 );
-CREATE TABLE DIM_Report (
-    Ticker STRING,
-    ReportDate DATE,
-    TotalRevenue DOUBLE,
-    NetIncome DOUBLE,
-    GrossProfit DOUBLE,
-    EPS DOUBLE,
-    NormalizedEBITDA DOUBLE,
 
-    PRIMARY KEY (Ticker, ReportDate),
-    FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker)
-    
+CREATE TABLE DIM_Report (
+    Ticker VARCHAR(255),
+    ReportDate DATE,
+    TotalRevenue FLOAT,
+    NetIncome FLOAT,
+    GrossProfit FLOAT,
+    EPS FLOAT,
+    NormalizedEBITDA FLOAT,
+    PRIMARY KEY (Ticker, ReportDate)
 );
+
 CREATE TABLE FACT_Analysis (
-    FACT_ID INT PRIMARY KEY identity(1,1),
-    Ticker STRING,
+    FACT_ID INT PRIMARY KEY IDENTITY(1,1),
+    Ticker VARCHAR(255),
     ReportDate DATE,
     FOREIGN KEY (Ticker) REFERENCES DIM_Ticker (Ticker),
     FOREIGN KEY (Ticker, ReportDate) REFERENCES DIM_Report (Ticker, ReportDate)
-    
 );
+
