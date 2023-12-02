@@ -9,9 +9,9 @@ CREATE TABLE DIM_Report (
     ReportDate DATE,
     TotalRevenue FLOAT,
     NetIncome FLOAT,
+    TotalExpenses FLOAT,
     GrossProfit FLOAT,
     EPS FLOAT,
-    NormalizedEBITDA FLOAT,
     PRIMARY KEY (Ticker, ReportDate)
 );
 
