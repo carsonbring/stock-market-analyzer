@@ -1,6 +1,7 @@
 CREATE TABLE DIM_Ticker (
     Ticker VARCHAR(255) PRIMARY KEY,
     CompanyName VARCHAR(255),
+    Sector VARCHAR(255),
     Average_Sentiment FLOAT
 );
 
